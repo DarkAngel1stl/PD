@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
+  password String
+  name     String
+  role     Role   @default(admin)
+
+  @@map("users")
+}
+
+model Session {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String  @unique @db.ObjectId
+  refreshToken String?
+
+  @@map("sessions")
+}
+
+model Event {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  content       String
+  organizer     Organizer
+  website       String
+  ageCategory   String
+  format        Format
+  startDate     DateTime
+  endDate       DateTime
+  images        String[]
+  address       Address
+  published     Boolean        @default(false)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  categories    Category[]     @relation(fields: [categoryIds], references: [id])
+  categoryIds   String[]       @db.ObjectId
+  subscriptions Subscription[]
+
+  @@map("events")
+}
+
+model Club {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  organizer   Organizer
+  website     String
+  ageCategory AgeCategory
+  format      Format
+  type        ClubType
+  images      String[]
+  address     Address
+  published   Boolean     @default(false)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  categories  Category[]  @relation(fields: [categoryIds], references: [id])
+  categoryIds String[]    @db.ObjectId
+
+  @@map("clubs")
+}
+
+model Program {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  organizer   Organizer
+  website     String
+  images      String[]
+  city        String
+  startDate   DateTime?
+  endDate     DateTime?
+  isDated     Boolean
+  published   Boolean    @default(false)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  categories  Category[] @relation(fields: [categoryIds], references: [id])
+  categoryIds String[]   @db.ObjectId
+
+  @@map("programs")
+}
+
+model Category {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  events     Event[]   @relation(fields: [eventIds], references: [id])
+  eventIds   String[]  @db.ObjectId
+  clubs      Club[]    @relation(fields: [clubIds], references: [id])
+  clubIds    String[]  @db.ObjectId
+  programs   Program[] @relation(fields: [programIds], references: [id])
+  programIds String[]  @db.ObjectId
+
+  @@map("categories")
+}
+
+model Subscription {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String
+  event   Event    @relation(fields: [eventId], references: [id])
+  eventId String   @db.ObjectId
+  date    DateTime @default(now())
+
+  @@map("subscriptions")
+}
+
+type Organizer {
+  name  String
+  email String
+}
+
+type Address {
+  country String
+  city    String
+  text    String
+  point   Float[]
+}
+
+type AgeCategory {
+  from String
+  to   String
+}
+
+enum ClubType {
+  section
+  club
+}
+
+enum Format {
+  online
+  offline
+  combined
+}
+
+enum Role {
+  admin
+  customer
+}
