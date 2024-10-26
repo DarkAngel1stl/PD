@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    @apply border-slate-300;
+    font-family: var(--font-roboto);
+  }
+
+  body {
+    @apply font-medium text-zinc-950;
+  }
+}
+
+@layer utilities {
+  .popover-content-width {
+    @apply max-h-[var(--radix-popover-content-available-height)] w-[var(--radix-popover-trigger-width)];
+  }
+
+  .container {
+    @apply mx-auto max-w-screen-xl px-6;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
